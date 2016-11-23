@@ -5,6 +5,14 @@ var whiteboard = whiteboard || {};
 whiteboard.canvas = document.getElementById("whiteboard");
 
 /**
+ * whiteboard.lastDrawnPoint
+ *
+ * We store the last drawn point, that way we can interpolate between the individual dots.
+ * Originally is initialized off screen
+ */
+whiteboard.lastDrawnPoint = new Point(-999, -999);
+
+/**
  * whiteboard.drawStroke
  * 
  * @param  {Point[]} points Array of all the ints to represent the path to draw.
@@ -19,8 +27,12 @@ whiteboard.drawStroke = function(points) {
 	// Fetch the context from the canvas
 	var ctx = whiteboard.canvas.getContext("2d");
 
+	// If we are currently drawing, then move the context to the last drawn point.
+	if (whiteboard.isDrawing) {
+		ctx.moveTo(whiteboard.lastDrawnPoint.x, whiteboard.lastDrawnPoint.y);
+	}
 	// Move the context to the first point in the path.
-	if (points.length > 0 && points[0] instanceof Point) {
+	else if (points.length > 0 && points[0] instanceof Point) {
 		ctx.moveTo(points[0].x, points[0].y);
 	}
 
@@ -34,11 +46,14 @@ whiteboard.drawStroke = function(points) {
 			return -1;
 		}
 
-		console.log(p.x + ", " + p.y);
-
-		// Bring the context to this point
+		// Create a line and draw
 		ctx.lineTo(p.x + 0.5, p.y);
 		ctx.stroke();
+	}
+
+	// Set the last drawn point
+	if (points.length > 0) {
+		whiteboard.lastDrawnPoint = points[points.length - 1];
 	}
 }
 
@@ -77,6 +92,12 @@ whiteboard.trackMouse = function(event) {
 		// event.which is a 0/1 value; 1 when mouse is pressed, 0 otherwise.
 		if (event.which == 1) {
 			whiteboard.drawStroke([new Point(event.pageX, event.pageY)]);
+			// Take note that the most recent event was a mousepress
+			whiteboard.isDrawing = true;
+		}
+		else {
+			// Take note that the most recent event was not a mousepress
+			whiteboard.isDrawing = false;
 		}
 };
 
