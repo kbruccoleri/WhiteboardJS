@@ -18,7 +18,7 @@ var testDrawStroke = function() {
 		points.push(p);
 	}
 
-	whiteboard.drawStroke(points);
+	brush.drawStroke(points);
 }
 
 /**
