@@ -10,18 +10,34 @@
 var brush = brush || {};
 
 /**
- * Stores the brush color as a hexadecimal value.
- * @type {String}
+ * brush.color
+ *
+ * Hexadecimal representation of the brush's color.
  */
-brush.color = "#FFF";
-
+brush.color = "#000000";
 
 /**
- * Stores the size of the brush (in pixels)
- * @type {Number}
+ * brush.size
+ *
+ * The width of the line of the brush stroke.
  */
 brush.size = 1;
 
+
+/**
+ * brush.setColor
+ *
+ * This function ensures that the color being passed through is a valid
+ * value for the brush's color, and if not, it defaults to the original, "#000000".
+ */
+brush.setColor = function(color) {
+	if (helper.verifyHex(color)) {
+		brush.color = color;
+	}
+	else {
+		brush.color = "#000000";
+	}
+}
 
 /**
  * brush.drawStroke
@@ -37,6 +53,15 @@ brush.drawStroke = function(points) {
 
 	// Fetch the context from the canvas
 	var ctx = whiteboard.canvas.getContext("2d");
+
+	// Begin path
+	ctx.beginPath();
+
+	// Modify the context to the properties of the brush
+	ctx.strokeStyle = brush.color;
+	ctx.lineWidth = brush.size;
+
+	debugger;
 
 	// If we are currently drawing, then move the context to the last drawn point.
 	if (whiteboard.isDrawing) {
@@ -66,4 +91,7 @@ brush.drawStroke = function(points) {
 	if (points.length > 0) {
 		whiteboard.lastDrawnPoint = points[points.length - 1];
 	}
-}
+
+	// Close path.
+	ctx.closePath();
+};

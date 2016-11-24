@@ -21,6 +21,12 @@ var testDrawStroke = function() {
 	brush.drawStroke(points);
 }
 
+var testBrushColor = function() {
+	var color = "#300";
+	brush.setColor(color);
+	testDrawStroke();
+}
+
 /**
  * Call all test functions once the 
  * @param  {[type]} ) {             testDrawStroke();} [description]
@@ -30,5 +36,6 @@ document.addEventListener("DOMContentLoaded", function() {
 	if (IS_DEV)
 	{
 		testDrawStroke();
+		testBrushColor();
 	}
 });
