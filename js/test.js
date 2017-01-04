@@ -22,7 +22,7 @@ var testDrawStroke = function() {
 }
 
 var testBrushColor = function() {
-	var color = "#300";
+	var color = "#F00";
 	brush.setColor(color);
 	testDrawStroke();
 }

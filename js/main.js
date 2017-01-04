@@ -10,4 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	// Attach the whiteboard resize event to onload and onresize
 	window.onload = whiteboard.resize;
 	window.resize = whiteboard.resize;
+
+	// Initialize the palette
+	palette.init();
 });

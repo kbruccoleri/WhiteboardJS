@@ -61,8 +61,6 @@ brush.drawStroke = function(points) {
 	ctx.strokeStyle = brush.color;
 	ctx.lineWidth = brush.size;
 
-	debugger;
-
 	// If we are currently drawing, then move the context to the last drawn point.
 	if (whiteboard.isDrawing) {
 		ctx.moveTo(whiteboard.lastDrawnPoint.x, whiteboard.lastDrawnPoint.y);
@@ -83,7 +81,7 @@ brush.drawStroke = function(points) {
 		}
 
 		// Create a line and draw
-		ctx.lineTo(p.x + 0.5, p.y);
+		ctx.lineTo(p.x, p.y);
 		ctx.stroke();
 	}
 

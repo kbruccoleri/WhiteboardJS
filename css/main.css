@@ -1,0 +1,42 @@
+#palette-container
+{
+	position: fixed;
+	top: 0;
+	right: 0;
+}
+
+#palette-expand-btn:before
+{
+	content: "<<"
+}
+
+#palette-expand-btn
+{
+	background: rgba(0, 0, 0, 0.5);
+	position: absolute;
+	top: 0;
+	right: 0;
+	padding: 15px;
+}
+
+#palette-container.expanded #palette-expand-btn
+{
+	right: 100px;
+}
+
+
+#palette
+{
+	display: none;
+}
+
+#palette-container.expanded #palette
+{
+	background: #000;
+	display: block;
+	position: fixed;
+	right: 0;
+	top: 0;
+	height: 400px;
+	width: 100px;
+}
