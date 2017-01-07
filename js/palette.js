@@ -45,6 +45,14 @@ palette.initColorSwatches = function() {
 		var newElement = document.createElement("div");
 		newElement.classList.add("color-swatch");
 		newElement.setAttribute("style", "background: " + this.defaultColors[i]);
+
+		// Now make the color swatch triggerable
+		newElement.addEventListener('click', function() {
+			// Fetch the background-color CSS of the swatch and use it to change the brush object.
+			brush.setColor(this.style.backgroundColor);
+		});
+
+		// Add the newly crafted element to the palette div.
 		palette.paletteDiv.appendChild(newElement);
 	}
 };

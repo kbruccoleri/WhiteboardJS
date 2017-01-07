@@ -31,7 +31,8 @@ brush.size = 1;
  * value for the brush's color, and if not, it defaults to the original, "#000000".
  */
 brush.setColor = function(color) {
-	if (helper.verifyHex(color)) {
+	// Verify that the color is either hex or rgb
+	if (helper.verifyHex(color) || helper.verifyRGB(color)) {
 		brush.color = color;
 	}
 	else {

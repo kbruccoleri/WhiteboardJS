@@ -1,22 +1,30 @@
 #palette-container
 {
+	opacity: 0.95;
 	position: fixed;
 	top: 0;
 	right: 0;
 }
 
-#palette-expand-btn:before
-{
-	content: "<<"
-}
-
 #palette-expand-btn
 {
-	background: rgba(0, 0, 0, 0.5);
 	position: absolute;
 	top: 0;
 	right: 0;
-	padding: 15px;
+	padding: 5px;
+	transition: 1;
+}
+
+#palette-expand-btn:after
+{
+	content: "<<";
+	-webkit-transition: all 1s;
+    transition: all 1s;
+}
+
+#palette-container.expanded #palette-expand-btn:after
+{
+	content: ">>"
 }
 
 #palette-container.expanded #palette-expand-btn
@@ -32,11 +40,19 @@
 
 #palette-container.expanded #palette
 {
-	background: #000;
 	display: block;
+	outline: 1px solid #CCCCCC;
 	position: fixed;
 	right: 0;
 	top: 0;
 	height: 400px;
 	width: 100px;
+}
+
+#palette .color-swatch
+{
+	display: inline-block;
+	margin: 5px;
+	height: 23px;
+	width: 23px;
 }
