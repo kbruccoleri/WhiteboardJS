@@ -24,7 +24,11 @@ var testDrawStroke = function() {
 var testBrushColor = function() {
 	var color = "#F00";
 	brush.setColor(color);
-	testDrawStroke();
+}
+
+var testBrushSize = function() {
+	var size = 5;
+	brush.setSize(size);
 }
 
 /**
@@ -33,9 +37,10 @@ var testBrushColor = function() {
  * @return {[type]}   [description]
  */
 document.addEventListener("DOMContentLoaded", function() {
-	if (IS_DEV)
+	if (IS_DEV && false)
 	{
-		testDrawStroke();
 		testBrushColor();
+		testBrushSize();
+		testDrawStroke();
 	}
 });

@@ -10,9 +10,26 @@
 var brush = brush || {};
 
 /**
+ * brush.MIN_SIZE
+ * 
+ * Used for validation in brush.setSize();
+ * @type {Number}
+ */
+brush.MIN_SIZE = 1;
+
+/**
+ * brush.MAX_SIZE
+ * 
+ * Used for validation in brush.setSize();
+ * @type {Number}
+ */
+brush.MAX_SIZE = 20;
+
+/**
  * brush.color
  *
- * Hexadecimal representation of the brush's color.
+ * Representation of the brush's color; can be represented using hex, rgb, or rgba, in the same manner that
+ * colors can be represented in typical CSS3 standards.
  */
 brush.color = "#000000";
 
@@ -94,3 +111,25 @@ brush.drawStroke = function(points) {
 	// Close path.
 	ctx.closePath();
 };
+
+/**
+ * Change the size of the brush
+ *
+ * @param {Number} brushSize	New brush size; must be between brush.MIN_SIZE and brush.MAX_SIZE
+ * @return {Boolean} 	True if size set was successful, false otherwise.
+ */
+brush.setSize = function(brushSize) {
+	// Only accept numbers.
+	brushSize = Number(brushSize);
+	if (brushSize === NaN) {
+		return false;
+	}
+
+	// Validate for min and max sizes.
+	if (brushSize < brush.MIN_SIZE) brushSize = brush.MIN_SIZE;
+	else if (brushSize > brush.MAX_SIZE) brushSize = brush.MAX_SIZE;
+
+	// Now that the brushSize has been validated, we will actually set it and return.
+	brush.size = brushSize;
+	return true;
+}

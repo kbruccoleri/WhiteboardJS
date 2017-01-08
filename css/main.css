@@ -51,8 +51,10 @@
 
 #palette .color-swatch
 {
+	border: 1px solid #CCC;
+	border-radius: 11px;
 	display: inline-block;
 	margin: 5px;
-	height: 23px;
-	width: 23px;
+	height: 21px;
+	width: 21px;
 }

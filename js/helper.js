@@ -10,6 +10,12 @@ var helper = helper || {};
 
 /************ Converters ************/
 
+/**
+ * Function designed with taking in a parameter or either String or Number, and converting it into a Number.
+ * 
+ * @param  {String/Number} input The input that is to be converted into a Number.
+ * @return {Number}       Converted into Number
+ */
 helper.toNumber = function(input) {
 	if (typeof input == "string" || input instanceof String) {
 		return Number(input.trim());		
@@ -17,15 +23,29 @@ helper.toNumber = function(input) {
 	return input;
 }
 
+/**
+ * toInteger converts its parameter into an Integer.
+ * 
+ * @param  {String/Number} input The input that is to be converted into a Integer.
+ * @return {Integer}       Result converted into Integer.
+ */
 helper.toInteger = function(input) {
 	if (typeof input == "string" || input instanceof String) {
 		return parseInt(input.trim());		
+	}
+	else if (typeof input == "number" || input instanceof Number) {
+		return parseInt(input);
 	}
 	return input;
 }
 
 /************ Color Verification ************/
 
+/**
+ * Verifies whether or not given string is a valid hexidecimal value. Accepts both hex values of either 3 or 6.
+ * @param  {String} hex Given hex value.
+ * @return {Boolean}    True if valid, false otherwise.
+ */
 helper.verifyHex = function(hex) {
 	if ( (typeof hex == "string" || hex instanceof String)
 		&& hex[0] === "#" 
@@ -38,6 +58,12 @@ helper.verifyHex = function(hex) {
 	}
 }
 
+
+/**
+ * Verifies whether or not given string is a valid rgb value.
+ * @param  {String} rgb Given rgb value.
+ * @return {Boolean}    True if valid, false otherwise.
+ */
 helper.verifyRGB = function(rgb) {
 	// Outer level verifies the proper syntax surrounding actual color value.
 	if ( (typeof rgb == "string" || rgb instanceof String)
@@ -68,6 +94,11 @@ helper.verifyRGB = function(rgb) {
 	}
 }
 
+/**
+ * Verifies whether or not given string is a valid rgba value.
+ * @param  {String} rgba Given rgba value.
+ * @return {Boolean}    True if valid, false otherwise.
+ */
 helper.verifyRGBA = function(rgba) {
 	// Outer level verifies the proper syntax surrounding actual color value.
 	if ( (typeof rgba == "string" || rgba instanceof String)
