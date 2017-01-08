@@ -60,9 +60,10 @@ brush.setColor = function(color) {
 /**
  * brush.drawStroke
  * 
- * @param  {Point[]} points Array of all the ints to represent the path to draw.
+ * @param  {Point[]} points 				Array of all the ints to represent the path to draw.
+ * @param  {JS Canvas Context object} ctx 	(Optional) param for passing a customized canvas context.
  */
-brush.drawStroke = function(points) {
+brush.drawStroke = function(points, ctx) {
 
 	// Fail fast if there are no points to draw.
 	if (points.length < 1) {
@@ -70,7 +71,7 @@ brush.drawStroke = function(points) {
 	}
 
 	// Fetch the context from the canvas
-	var ctx = whiteboard.canvas.getContext("2d");
+	var ctx = ctx || whiteboard.canvas.getContext("2d");
 
 	// Begin path
 	ctx.beginPath();
@@ -80,7 +81,7 @@ brush.drawStroke = function(points) {
 	ctx.lineWidth = brush.size;
 
 	// If we are currently drawing, then move the context to the last drawn point.
-	if (whiteboard.isDrawing) {
+	if (whiteboard.isInStroke) {
 		ctx.moveTo(whiteboard.lastDrawnPoint.x, whiteboard.lastDrawnPoint.y);
 	}
 	// Move the context to the first point in the path.

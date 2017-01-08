@@ -9,6 +9,10 @@
 
 var whiteboard = whiteboard || {};
 
+whiteboard.modes = Enum("DRAW", "ERASE");
+
+whiteboard.currentMode = whiteboard.modes.DRAW;
+
 /**
  * The actual canvas HTML element straight from the DOM.
  * @type {HTML element}
@@ -22,6 +26,14 @@ whiteboard.canvas = document.getElementById("whiteboard");
  * Originally is initialized off screen
  */
 whiteboard.lastDrawnPoint = new Point(-999, -999);
+
+/**
+ * whiteboard.isInStroke
+ *
+ * We store whether or not the user is currently dragging the cursor across the whiteboard. If so,
+ * this allows us to identify whether or not to fill in the gaps between various points detected.
+ */
+whiteboard.isInStroke = false;
 
 /**
  * whiteboard.trackMouse
@@ -57,13 +69,22 @@ whiteboard.trackMouse = function(event) {
 
 		// event.which is a 0/1 value; 1 when mouse is pressed, 0 otherwise.
 		if (event.which == 1) {
-			brush.drawStroke([new Point(event.pageX, event.pageY)]);
+			if (whiteboard.currentMode === whiteboard.modes.DRAW) {
+				brush.drawStroke([new Point(event.pageX, event.pageY)]);
+			}
+			else if (whiteboard.currentMode === whiteboard.modes.ERASE) {
+				// Pass through a customized version of the canvas context
+				var ctx = whiteboard.canvas.getContext("2d");
+				ctx.globalCompositeOperation = "destination-out";
+				// Utilize the brush drawStroke function, but also along with the customized context object.
+				brush.drawStroke([new Point(event.pageX, event.pageY)], ctx);
+			}
 			// Take note that the most recent event was a mousepress
-			whiteboard.isDrawing = true;
+			whiteboard.isInStroke = true;
 		}
 		else {
 			// Take note that the most recent event was not a mousepress
-			whiteboard.isDrawing = false;
+			whiteboard.isInStroke = false;
 		}
 };
 
