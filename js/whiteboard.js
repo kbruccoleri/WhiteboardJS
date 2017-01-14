@@ -99,3 +99,21 @@ whiteboard.resize = function() {
 	whiteboard.canvas.width = window.innerWidth;
 	whiteboard.canvas.height = window.innerHeight;
 }
+
+/**
+ * whiteboard.setCurrent Mode
+ * 
+ * @param {whiteboard.modes enum} newMode 	The new mode we are setting the whiteboard to.
+ * @return {Boolean}						True if successful, false otherwise.
+ */
+whiteboard.setCurrentMode = function(newMode) {
+	for (var mode in whiteboard.modes.all) {
+		if (mode == newMode) {
+			// We have found a match between the input and the mode enum. Set it and return true.
+			whiteboard.currentMode = helper.toInteger(mode);
+			return true;
+		}
+	}
+	// Unable to find what mode enum the input maps to.
+	return false;
+}

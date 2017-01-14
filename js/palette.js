@@ -15,6 +15,7 @@ palette.containerDiv = document.getElementById("palette-container");
 palette.arrowDiv = document.getElementById("palette-expand-btn");
 palette.paletteDiv = document.getElementById("palette");
 palette.colorSwatchContainer = document.getElementById("color-swatch-container");
+palette.colorInput = document.getElementById("color-input");
 palette.brushSizeInput = document.getElementById("brush-size");
 
 /**
@@ -26,6 +27,7 @@ palette.defaultColors = ["#000", "#F00", "#0F0", "#00F", "#FFF"];
 palette.init = function() {
 	palette.initToggle();
 	palette.initColorSwatches();
+	palette.initColorInput();
 	palette.initBrushSizeInput();
 };
 
@@ -65,11 +67,30 @@ palette.initColorSwatches = function() {
 		newElement.addEventListener('click', function() {
 			// Fetch the background-color CSS of the swatch and use it to change the brush object.
 			brush.setColor(this.style.backgroundColor);
+			
+			// The color input value has to be in hexadecimal format when being set externally.
+			var color = helper.colorToHex(brush.color);
+			palette.colorInput.value = color;
 		});
 
 		// Add the newly crafted element to the palette div.
 		palette.colorSwatchContainer.appendChild(newElement);
 	}
+};
+
+/**
+ * palette.initColorInput
+ * 
+ * Adds the change function necessary to track when the user adjusts the color input.
+ */
+palette.initColorInput = function() {
+	// Modify input value based on the current brush size.
+	palette.colorInput.value = brush.color;
+
+	// Add event listener on input change
+	palette.colorInput.addEventListener("input", function() {
+		brush.setColor(this.value);
+	})
 };
 
 /**
@@ -85,4 +106,4 @@ palette.initBrushSizeInput = function() {
 	palette.brushSizeInput.addEventListener("input", function() {
 		brush.setSize(this.value);
 	})
-}
+};

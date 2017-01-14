@@ -11,23 +11,90 @@ var helper = helper || {};
 /************ Converters ************/
 
 /**
+ * Function designed to take in a color string and ensure that it is converted to hexadecimal format.
+ * @param  {String} color Color string
+ * @return {String}       In hexadecimal format.
+ */
+helper.colorToHex = function(color) {
+	// Check if color is already in hexadecimal format.
+	if (helper.verifyHex(color)) {
+		return color;
+	}
+	// For now, RGBA format will be ignored and treated as RGB.
+	// Check if color is already in RGB format.
+	else if (helper.verifyRGB(color)) {
+		color = color.replace("rgb(", "").replace(")", "");
+		var colorList = color.split(",");
+		var redComp = helper.integerToHex(colorList[0], 2);
+		var greenComp = helper.integerToHex(colorList[1], 2);
+		var blueComp = helper.integerToHex(colorList[2], 2);
+
+		return '#' + redComp + greenComp + blueComp;
+	}
+	else if (helper.verifyRGBA(color)) {
+		color = color.replace("rgba(", "").replace(")", "");
+		var colorList = color.split(",");
+		var redComp = helper.integerToHex(colorList[0], 2);
+		var greenComp = helper.integerToHex(colorList[1], 2);
+		var blueComp = helper.integerToHex(colorList[2], 2);
+
+		return '#' + redComp + greenComp + blueComp;
+	}
+	else {
+		return null;
+	}
+}
+
+/**
+ * Function to convert an integer to a hexadecimal.
+ * 
+ * @param  {Integer} int       	An integer value for conversion.
+ * @param  {Integer} minLength  The shortest length acceptable for the result. 
+ * @return {String}          	Hexadecimal string.
+ */
+helper.integerToHex = function(int, minLength) {
+	// Ensure int is actually an integer.
+	int = helper.toInteger(int);
+	if (int === null) {
+		return null;
+	}
+
+	// Default minLength to 2 if not already set, as this function is mostly expected for use between 0 - 255.
+	minLength = minLength || 2;
+
+	// Prepare to loop through int, breaking off factors of 16 each time.
+	var hex = "";
+	while (int > 0) {
+		// Prepend new digit.
+		hex = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"][int % 16] + hex;
+		int = Math.floor(int/16);
+	}
+	// Prefill the hex if its length is shorter than desired.
+	while (hex.length < minLength) {
+		hex = "0" + hex;
+	}
+	
+	return hex;
+}
+
+/**
  * Function designed with taking in a parameter or either String or Number, and converting it into a Number.
  * 
  * @param  {String/Number} input The input that is to be converted into a Number.
- * @return {Number}       Converted into Number
+ * @return {Number/null}       Converted into Number; null if failure.
  */
 helper.toNumber = function(input) {
 	if (typeof input == "string" || input instanceof String) {
 		return Number(input.trim());		
 	}
-	return input;
-}
+	return null;
+};
 
 /**
  * toInteger converts its parameter into an Integer.
  * 
  * @param  {String/Number} input The input that is to be converted into a Integer.
- * @return {Integer}       Result converted into Integer.
+ * @return {Integer/null}       Result converted into Integer; null if failure.
  */
 helper.toInteger = function(input) {
 	if (typeof input == "string" || input instanceof String) {
@@ -36,8 +103,8 @@ helper.toInteger = function(input) {
 	else if (typeof input == "number" || input instanceof Number) {
 		return parseInt(input);
 	}
-	return input;
-}
+	return null;
+};
 
 /************ Color Verification ************/
 
@@ -56,7 +123,7 @@ helper.verifyHex = function(hex) {
 	else {
 		return false;
 	}
-}
+};
 
 
 /**
@@ -92,7 +159,7 @@ helper.verifyRGB = function(rgb) {
 	else {
 		return false;
 	}
-}
+};
 
 /**
  * Verifies whether or not given string is a valid rgba value.
@@ -135,4 +202,4 @@ helper.verifyRGBA = function(rgba) {
 	else {
 		return false;
 	}
-}
+};
