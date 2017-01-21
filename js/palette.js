@@ -17,6 +17,7 @@ palette.paletteDiv = document.getElementById("palette");
 palette.colorSwatchContainer = document.getElementById("color-swatch-container");
 palette.colorInput = document.getElementById("color-input");
 palette.brushSizeInput = document.getElementById("brush-size");
+palette.whiteboardModeSwitchContainer = document.getElementById("whiteboard-mode-switch-container");
 
 /**
  * An array of CSS3 standardized colors; can be strings containing valid hex, rgb(), rgba() values.
@@ -106,4 +107,23 @@ palette.initBrushSizeInput = function() {
 	palette.brushSizeInput.addEventListener("input", function() {
 		brush.setSize(this.value);
 	})
+};
+
+/**
+ * palette.initWhiteboardModeSwitches
+ *
+ * Adds the functionality of mode switching.
+ */
+palette.initWhiteboardModeSwitches = function() {
+	// Create and append children to the whiteboard mode switch container, one for each mode.
+	for (var modeKey in whiteboard.modes.keys) {
+		// Create new element with its class and id.
+		var newElement = document.createElement("div");
+		newElement.classList.append("whiteboard-mode-switch");
+		newElement.id = "whiteboard-" + modeKey.toLowerCase() + "-mode";
+		newElement.value = modeKey;
+	}
+
+	palette.whiteboardModeSwitchContainer
+
 };

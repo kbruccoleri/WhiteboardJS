@@ -9,11 +9,30 @@
 
 var whiteboard = whiteboard || {};
 
+/**
+ * whiteboard.canvasID
+ * 
+ * The canvas is identified using a hash code.
+ *
+ * @type {String}
+ */
+whiteboard.canvasID = "MxB4c";
+
+/**
+ * whiteboard.modes
+ *
+ * An enum that represents the different action modes possible with the whiteboard.
+ * "DRAW" is to using a brush tool, as "ERASE" is to using an eraser.
+ * 
+ * @type {Enum}
+ */
 whiteboard.modes = Enum("DRAW", "ERASE");
 
 whiteboard.currentMode = whiteboard.modes.DRAW;
 
 /**
+ * whiteboard.canvas
+ * 
  * The actual canvas HTML element straight from the DOM.
  * @type {HTML element}
  */
@@ -24,6 +43,8 @@ whiteboard.canvas = document.getElementById("whiteboard");
  *
  * We store the last drawn point, that way we can interpolate between the individual dots.
  * Originally is initialized off screen
+ *
+ * @type {Point}
  */
 whiteboard.lastDrawnPoint = new Point(-999, -999);
 
@@ -32,6 +53,8 @@ whiteboard.lastDrawnPoint = new Point(-999, -999);
  *
  * We store whether or not the user is currently dragging the cursor across the whiteboard. If so,
  * this allows us to identify whether or not to fill in the gaps between various points detected.
+ *
+ * @type {Boolean}
  */
 whiteboard.isInStroke = false;
 
@@ -116,4 +139,37 @@ whiteboard.setCurrentMode = function(newMode) {
 	}
 	// Unable to find what mode enum the input maps to.
 	return false;
+}
+
+
+whiteboard.saveCanvas = function() {
+	// First convert the canvas to a blob.
+	var canvasBlob = whiteboard.canvas.toDataURL("image/png");
+
+	// Send to server as ajax
+	var xhr = new XMLHttpRequest();
+	var url = "api/save.php";
+	var params = "canvasID=" + whiteboard.canvasID + "&imgBase64=" + canvasBlob;
+	xhr.open('POST', url, true);
+
+	// Send headers
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+	// Deal with server response
+	xhr.onreadystatechange = function() {
+		// readyState 4 means the request is done.
+		var DONE = 4;
+		// HTTP status 200 is a successful return
+		var OK = 200;
+		if (xhr.readyState === DONE) {
+			if (xhr.status === OK) {
+				console.log("SAVE SUCCESSFUL.");
+			}
+			else {
+				console.log("SAVE FAILED.");
+			}
+		}
+	};
+
+	xhr.send(params);
 }
