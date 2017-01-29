@@ -111,6 +111,9 @@ brush.drawStroke = function(points, ctx) {
 
 	// Close path.
 	ctx.closePath();
+
+	// Save whiteboard.
+	whiteboard.saveCanvas();
 };
 
 /**

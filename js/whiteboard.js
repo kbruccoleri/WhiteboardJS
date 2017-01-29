@@ -10,13 +10,22 @@
 var whiteboard = whiteboard || {};
 
 /**
+ * whiteboard.canvasLoaded
+ *
+ * True if the canvas has been loaded, false otherwise.
+ *
+ * @type {Boolean}
+ */
+whiteboard.canvasLoaded = false;
+
+/**
  * whiteboard.canvasID
  * 
  * The canvas is identified using a hash code.
  *
  * @type {String}
  */
-whiteboard.canvasID = "MxB4c";
+whiteboard.canvasID = "";
 
 /**
  * whiteboard.modes
@@ -27,8 +36,6 @@ whiteboard.canvasID = "MxB4c";
  * @type {Enum}
  */
 whiteboard.modes = Enum("DRAW", "ERASE");
-
-whiteboard.currentMode = whiteboard.modes.DRAW;
 
 /**
  * whiteboard.canvas
@@ -57,6 +64,43 @@ whiteboard.lastDrawnPoint = new Point(-999, -999);
  * @type {Boolean}
  */
 whiteboard.isInStroke = false;
+
+/**
+ * whiteboard.init
+ *
+ * This function handles any configuration required for the whiteboard object prior to use.
+ * 
+ */
+whiteboard.init = function() {
+	// Attach the trackMouse function to the document
+	document.onmousemove = whiteboard.trackMouse;
+	// Attach the whiteboard resize event to onload and onresize
+	window.onload = whiteboard.resize;
+	window.resize = whiteboard.resize;
+
+	// Set the default mode of the whiteboard to draw.
+	whiteboard.currentMode = whiteboard.modes.DRAW;
+
+	if (window.location.hash) {
+		// Set canvas ID using the hash in the url.
+		whiteboard.canvasID = window.location.hash.replace("#", "");
+
+		// Attempt to load the canvas with the associated hash.
+		whiteboard.loadCanvas();
+
+		// Wait for finished response from canvas load, and create new canvas if not successful.
+		callback.register("onCanvasLoad", function() {
+			// If ID or canvas not available, create a new canvas on the backend, fetching a new id.
+			if (!whiteboard.canvasLoaded) {
+				whiteboard.createCanvas();
+			}
+		});
+	}
+	else {
+		// User has no specific canvas in mind, so create a fresh one.
+		whiteboard.createCanvas();
+	}
+}
 
 /**
  * whiteboard.trackMouse
@@ -124,7 +168,7 @@ whiteboard.resize = function() {
 }
 
 /**
- * whiteboard.setCurrent Mode
+ * whiteboard.setCurrentMode
  * 
  * @param {whiteboard.modes enum} newMode 	The new mode we are setting the whiteboard to.
  * @return {Boolean}						True if successful, false otherwise.
@@ -141,7 +185,76 @@ whiteboard.setCurrentMode = function(newMode) {
 	return false;
 }
 
+/**
+ * whiteboard.setCanvasID
+ * 
+ * @param {String} id 	The new canvas ID for the whiteboard.
+ * @return {Boolean}	True if successful, false otherwise.
+ */
+whiteboard.setCanvasID = function(id) {
+	if ((typeof(id) === "string" || id instanceof String) && id.length > 0) {
+		// Set the window's hash and the whiteboard's canvasID.
+		window.location.hash = id;
+		whiteboard.canvasID = id;
+		return true;
+	}
+	// Input is not valid string.
+	return false;
+}
 
+/**
+ * whiteboard.createCanvas
+ * 
+ * This function uses ajax to communicate with the backend and generate a random, unused canvas ID
+ * to start using for this new whiteboard.
+ *
+ */
+whiteboard.createCanvas = function() {
+
+	// Send to server as ajax
+	var xhr = new XMLHttpRequest();
+	var url = "api/create.php";
+	xhr.open('POST', url, true);
+
+	// Send headers
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+	// Deal with server response
+	xhr.onreadystatechange = function() {
+		// readyState 4 means the request is done.
+		var DONE = 4;
+		// HTTP status 200 is a successful return
+		var OK = 200;
+		if (xhr.readyState === DONE) {
+			// The request is finished and we got a response of some kind
+			// Parse from JSON string into object.
+			var response = JSON.parse(xhr.response);
+			if (xhr.status === OK) {
+				if (response.success) {
+					// console.log("CREATE SUCCESSFUL.");
+					whiteboard.canvasLoaded = whiteboard.setCanvasID(response.canvasID);
+				}
+				else {
+					console.log("CREATE FAILED: " + response.message);
+				}
+			}
+			else {
+				console.log("CREATE FAILED.");
+			}
+		}
+	};
+
+	// No parameters to be sent at this time.
+	xhr.send(null);
+}
+
+/**
+ * whiteboard.saveCanvas
+ *
+ * This function converts the content of the canvas into a PNG image formatted in base64 encoding,
+ * which is then sent to the backend for storage in the database.
+ *
+ */
 whiteboard.saveCanvas = function() {
 	// First convert the canvas to a blob.
 	var canvasBlob = whiteboard.canvas.toDataURL("image/png");
@@ -164,10 +277,15 @@ whiteboard.saveCanvas = function() {
 		if (xhr.readyState === DONE) {
 			var response = JSON.parse(xhr.response);
 			if (xhr.status === OK) {
-				console.log("SAVE SUCCESSFUL.");
+				if (response.success) {
+					// console.log("SAVE SUCCESSFUL.");				
+				}
+				else {
+					console.log("SAVE FAILED: " + response.message);
+				}
 			}
 			else {
-				console.log("SAVE FAILED: " + response.message);
+				console.log("SAVE FAILED.");
 			}
 		}
 	};
@@ -175,6 +293,14 @@ whiteboard.saveCanvas = function() {
 	xhr.send(params);
 }
 
+/**
+ * whiteboard.loadCanvas
+ *
+ * This function loads communicates with backend asynchroniously and requests that the backend load
+ * and return the base64 encoded image. Then, the front loads the source into a dummy image, and uses
+ * that dummy image to draw to the canvas.
+ *
+ */
 whiteboard.loadCanvas = function() {
 
 	// Send to server as ajax
@@ -196,20 +322,30 @@ whiteboard.loadCanvas = function() {
 			// Parse from JSON string into object.
 			var response = JSON.parse(xhr.response);
 			if (xhr.status === OK) {
-				// Take the canvas blob and create a new image with it.
-				var image = new Image();
-				// Upon loading the image, draw it.
-				image.onload = function() {
-					whiteboard.canvas.getContext("2d").drawImage(image, 0, 0);
+				if (response.success) {
+					if (response.canvasBlob !== null && response.canvasBlob !== undefined && response.canvasBlob.length > 0) {
+						// Take the canvas blob and create a new image with it.
+						var image = new Image();
+						// Upon loading the image, draw it.
+						image.onload = function() {
+							whiteboard.canvas.getContext("2d").drawImage(image, 0, 0);
+						}
+						// The image's source will be the canvas blob we received from the response.
+						image.src = response.canvasBlob;
+					}
+					// console.log("LOAD SUCCESSFUL.");
+					whiteboard.canvasLoaded = true;
 				}
-				// The image's source will be the canvas blob we received from the response.
-				// debugger;
-				image.src = response.canvasBlob;
-				console.log("LOAD SUCCESSFUL.");
+				else {
+					console.log("LOAD FAILED. " + response.message);
+				}
 			}
 			else {
-				console.log("LOAD FAILED: " + response.message);
+				console.log("LOAD FAILED.");
 			}
+
+			// Response has finished. Trigger any callbacks associated with onCanvasLoad.
+			callback.call("onCanvasLoad");
 		}
 	};
 

@@ -2,6 +2,48 @@
 
 require_once("databaseFunctions.php");
 
+DEFINE("CANVAS_ID_LENGTH", 25);
+DEFINE("ALPHABET", "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789");
+
+function createNewCanvas() {
+
+	// Set up return array.
+	$returnArray["message"] = "Canvas creation error.";
+	$returnArray["canvasID"] = null;
+	$returnArray["success"] = false;
+
+	// Connect to the database.
+	$c = databaseConnect();
+	if (!$c) {
+		return $returnArray;
+	}
+
+	$numAttempts = 0;
+	while (true) {
+		// Generate an ID
+		$id = "";
+		while (strlen($id) < CANVAS_ID_LENGTH) {
+			$id .= substr(ALPHABET, rand(0, strlen(ALPHABET)), 1);
+		}
+		
+		// Attempt to save using new id and blank canvas
+		$saveResponse = saveCanvasAsPhoto($id, "");
+		if ($saveResponse["success"]) {
+			break;
+		}
+
+		$numAttempts++;
+		if ($numAttempts === 5) {
+			return $returnArray;
+		}
+	}
+
+	$returnArray["canvasID"] = $id;
+	$returnArray["success"] = true;
+	$returnArray["message"] = "";
+	return $returnArray;
+}
+
 /**
  * This functions saves the canvas object as a data blob in the database.
  * @param  [String] $id         Identifier of canvas
@@ -45,9 +87,6 @@ function saveCanvasAsPhoto($id, $canvasBlob) {
  */
 function getCanvasBlob($id) {
 
-	// Up memory limit
-	// ini_set("memory_limit", "16M");
-
 	// Set up return array.
 	$returnArray["message"] = "ERROR";
 	$returnArray["canvasBlob"] = "";
@@ -70,8 +109,8 @@ function getCanvasBlob($id) {
 	mysqli_stmt_fetch($stmt);
 
 	if(mysqli_stmt_num_rows($stmt) < 1) {
-		$returnArray["message"] = "There is no canvas with the given identifier. Try again later.";
-		return $return_array;
+		$returnArray["message"] = "There is no canvas with the given identifier.";
+		return $returnArray;
 	}
 
 	$returnArray["canvasBlob"] = $canvas_image;

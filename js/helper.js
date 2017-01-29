@@ -11,6 +11,8 @@ var helper = helper || {};
 /************ Converters ************/
 
 /**
+ * helper.colorToHex
+ * 
  * Function designed to take in a color string and ensure that it is converted to hexadecimal format.
  * @param  {String} color Color string
  * @return {String}       In hexadecimal format.
@@ -46,6 +48,8 @@ helper.colorToHex = function(color) {
 }
 
 /**
+ * helper.integerToHex
+ * 
  * Function to convert an integer to a hexadecimal.
  * 
  * @param  {Integer} int       	An integer value for conversion.
@@ -78,6 +82,8 @@ helper.integerToHex = function(int, minLength) {
 }
 
 /**
+ * helper.toNumber
+ * 
  * Function designed with taking in a parameter or either String or Number, and converting it into a Number.
  * 
  * @param  {String/Number} input The input that is to be converted into a Number.
@@ -91,6 +97,8 @@ helper.toNumber = function(input) {
 };
 
 /**
+ * helper.toInteger
+ * 
  * toInteger converts its parameter into an Integer.
  * 
  * @param  {String/Number} input The input that is to be converted into a Integer.
@@ -104,6 +112,44 @@ helper.toInteger = function(input) {
 		return parseInt(input);
 	}
 	return null;
+};
+
+/************ Type verification *************/
+
+/**
+ * helper.isSet
+ *
+ * This function verifies if given input is set, that is, defined and non-null.
+ * 
+ * @param  {*} x  		Input to be tested.
+ * @return {Boolean}  	True if x is a defined and non-null, otherwise false.
+ */
+helper.isSet = function(x) {
+	return (x !== undefined && x !== null);
+}
+
+/**
+ * helper.verifyString
+ *
+ * This function verifies if given input is a String.
+ * 
+ * @param  {*} s  		Input to be tested.
+ * @return {Boolean}  	True if input is a String, otherwise false.
+ */
+helper.verifyString = function(s) {
+	return (typeof(s) === "string" || s instanceof String);
+};
+
+/**
+ * helper.verifyFunction
+ *
+ * This function verifies if given input is a Function.
+ * 
+ * @param  {*} f  		Input to be tested.
+ * @return {Boolean}  	True if input is a Function, otherwise false.
+ */
+helper.verifyFunction = function(f) {
+	return (typeof(f) === "function" || f instanceof Function);
 };
 
 /************ Color Verification ************/
@@ -127,6 +173,8 @@ helper.verifyHex = function(hex) {
 
 
 /**
+ * helper.verifyRGB 
+ * 
  * Verifies whether or not given string is a valid rgb value.
  * @param  {String} rgb Given rgb value.
  * @return {Boolean}    True if valid, false otherwise.
@@ -162,6 +210,8 @@ helper.verifyRGB = function(rgb) {
 };
 
 /**
+ * helper.verifyRGBA
+ * 
  * Verifies whether or not given string is a valid rgba value.
  * @param  {String} rgba Given rgba value.
  * @return {Boolean}    True if valid, false otherwise.
