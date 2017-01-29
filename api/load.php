@@ -8,6 +8,8 @@
 
 require_once("core/storageFunctions.php");
 
-echo(json_encode(saveCanvasAsPhoto($_POST["canvasID"], $_POST["imgBase64"])));
+header("Content-type: image/png");
+
+echo(json_encode(getCanvasBlob($_GET["canvasID"])));
 
 ?>

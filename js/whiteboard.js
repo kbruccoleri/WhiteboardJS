@@ -149,7 +149,7 @@ whiteboard.saveCanvas = function() {
 	// Send to server as ajax
 	var xhr = new XMLHttpRequest();
 	var url = "api/save.php";
-	var params = "canvasID=" + whiteboard.canvasID + "&imgBase64=" + canvasBlob;
+	var params = "canvasID=" + whiteboard.canvasID + "&imgBase64=" + encodeURIComponent(canvasBlob);
 	xhr.open('POST', url, true);
 
 	// Send headers
@@ -162,14 +162,56 @@ whiteboard.saveCanvas = function() {
 		// HTTP status 200 is a successful return
 		var OK = 200;
 		if (xhr.readyState === DONE) {
+			var response = JSON.parse(xhr.response);
 			if (xhr.status === OK) {
 				console.log("SAVE SUCCESSFUL.");
 			}
 			else {
-				console.log("SAVE FAILED.");
+				console.log("SAVE FAILED: " + response.message);
 			}
 		}
 	};
 
 	xhr.send(params);
+}
+
+whiteboard.loadCanvas = function() {
+
+	// Send to server as ajax
+	var xhr = new XMLHttpRequest();
+	var url = "api/load.php?canvasID=" + whiteboard.canvasID;
+	xhr.open('GET', url, true);
+
+	// Send headers
+	xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+	// Deal with server response
+	xhr.onreadystatechange = function() {
+		// readyState 4 means the request is done.
+		var DONE = 4;
+		// HTTP status 200 is a successful return
+		var OK = 200;
+		if (xhr.readyState === DONE) {
+			// The request is finished and we got a response of some kind
+			// Parse from JSON string into object.
+			var response = JSON.parse(xhr.response);
+			if (xhr.status === OK) {
+				// Take the canvas blob and create a new image with it.
+				var image = new Image();
+				// Upon loading the image, draw it.
+				image.onload = function() {
+					whiteboard.canvas.getContext("2d").drawImage(image, 0, 0);
+				}
+				// The image's source will be the canvas blob we received from the response.
+				// debugger;
+				image.src = response.canvasBlob;
+				console.log("LOAD SUCCESSFUL.");
+			}
+			else {
+				console.log("LOAD FAILED: " + response.message);
+			}
+		}
+	};
+
+	xhr.send(null);
 }
